@@ -37,7 +37,6 @@ namespace TravelPlannerAPI.Models
                 .WithMany(l => l.Viajes) 
                 .HasForeignKey(vl => vl.IdLugar);
 
-            // Si tienes otras configuraciones, agrégalas aquí.
         }
     }
 }
