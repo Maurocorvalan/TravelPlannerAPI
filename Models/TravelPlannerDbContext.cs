@@ -16,5 +16,28 @@ namespace TravelPlannerAPI.Models
         public DbSet<Lugar> Lugares { get; set; }
         public DbSet<Notificacion> Notificaciones { get; set; }
         public DbSet<Preferencia> Preferencias { get; set; }
+        public DbSet<Viaje_Lugar> Viaje_Lugares { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            // Configuración de la clave primaria compuesta para Viaje_Lugar
+            modelBuilder.Entity<Viaje_Lugar>()
+                .HasKey(vl => new { vl.IdViaje, vl.IdLugar });
+
+            // Configuración de las relaciones
+            modelBuilder.Entity<Viaje_Lugar>()
+                .HasOne(vl => vl.Viaje)
+                .WithMany(v => v.Lugares)
+                .HasForeignKey(vl => vl.IdViaje);
+
+            modelBuilder.Entity<Viaje_Lugar>()
+                .HasOne(vl => vl.Lugar)
+                .WithMany(l => l.Viajes) 
+                .HasForeignKey(vl => vl.IdLugar);
+
+            // Si tienes otras configuraciones, agrégalas aquí.
+        }
     }
 }

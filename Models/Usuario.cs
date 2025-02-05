@@ -8,7 +8,7 @@ public class Usuario
     public int IdUsuario { get; set; }
 
     [Required]
-    public string Nombre { get; set; }
+    public string Nombre { get; set; } 
 
     [Required]
     [EmailAddress]

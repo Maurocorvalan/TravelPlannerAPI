@@ -19,5 +19,5 @@ public class Lugar
     public string Categoria { get; set; }
 
     // Relaciones
-    public List<Viaje_Lugar> ViajeLugares { get; set; }
+    public List<Viaje_Lugar> Viajes { get; set; }
 }
