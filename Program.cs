@@ -46,8 +46,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-app.UseAuthentication();
-app.UseAuthorization();
+
 // app.UseHttpsRedirection();
 using (var scope = app.Services.CreateScope())
 {
@@ -64,6 +63,8 @@ using (var scope = app.Services.CreateScope())
 }
 
 Console.WriteLine($"Aplicación levantada en el puerto: {builder.Configuration["ASPNETCORE_URLS"]}");
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapControllers();
 app.Run();
 
