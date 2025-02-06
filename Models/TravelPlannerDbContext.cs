@@ -34,8 +34,12 @@ namespace TravelPlannerAPI.Models
 
             modelBuilder.Entity<Viaje_Lugar>()
                 .HasOne(vl => vl.Lugar)
-                .WithMany(l => l.Viajes) 
+                .WithMany(l => l.Viajes)
                 .HasForeignKey(vl => vl.IdLugar);
+                
+            modelBuilder.Entity<Viaje>()
+                .Property(v => v.IdUsuario)
+                .HasColumnName("id_usuario");
 
         }
     }

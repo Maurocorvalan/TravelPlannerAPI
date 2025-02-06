@@ -2,13 +2,18 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 public class Viaje
 {
     [Key]
+    [Column("id_viaje")]
+
     public int IdViaje { get; set; }
 
     [Required]
+    [Column("id_usuario")]
+
     public int IdUsuario { get; set; }
 
     [Required]
@@ -18,11 +23,14 @@ public class Viaje
     public string Descripcion { get; set; }
 
     [Required]
+    [Column("fecha_inicio")]
+
     public DateTime FechaInicio { get; set; }
 
     [Required]
-    public DateTime FechaFin { get; set; }
+    [Column("fecha_fin")]
 
+    public DateTime FechaFin { get; set; }
     // Relaciones
     [ForeignKey("IdUsuario")]
     public Usuario Usuario { get; set; }
