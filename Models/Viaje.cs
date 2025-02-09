@@ -35,7 +35,6 @@ public class Viaje
     [ForeignKey("IdUsuario")]
     public Usuario Usuario { get; set; }
 
-    public List<Itinerario> Itinerarios { get; set; }
     public List<Gasto> Gastos { get; set; }
     public List<Foto> Fotos { get; set; }
     public List<Viaje_Lugar> Lugares { get; set; }

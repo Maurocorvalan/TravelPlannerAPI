@@ -27,16 +27,13 @@ namespace TravelPlannerAPI.Models
                 .HasKey(vl => new { vl.IdViaje, vl.IdLugar });
 
             // Configuración de las relaciones
-            modelBuilder.Entity<Viaje_Lugar>()
-                .HasOne(vl => vl.Viaje)
-                .WithMany(v => v.Lugares)
-                .HasForeignKey(vl => vl.IdViaje);
+
 
             modelBuilder.Entity<Viaje_Lugar>()
                 .HasOne(vl => vl.Lugar)
                 .WithMany(l => l.Viajes)
                 .HasForeignKey(vl => vl.IdLugar);
-                
+
             modelBuilder.Entity<Viaje>()
                 .Property(v => v.IdUsuario)
                 .HasColumnName("id_usuario");
