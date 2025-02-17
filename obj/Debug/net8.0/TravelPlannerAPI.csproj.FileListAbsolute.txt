@@ -47,3 +47,4 @@ C:\Users\mauro\TravelPlannerAPI\bin\Debug\net8.0\Microsoft.IdentityModel.Protoco
 C:\Users\mauro\TravelPlannerAPI\bin\Debug\net8.0\Microsoft.IdentityModel.Tokens.dll
 C:\Users\mauro\TravelPlannerAPI\bin\Debug\net8.0\System.IdentityModel.Tokens.Jwt.dll
 C:\Users\mauro\TravelPlannerAPI\bin\Debug\net8.0\BCrypt.Net-Next.dll
+C:\Users\mauro\TravelPlannerAPI\bin\Debug\net8.0\Newtonsoft.Json.dll

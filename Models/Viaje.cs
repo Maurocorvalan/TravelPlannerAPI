@@ -26,7 +26,6 @@ public class Viaje
     [Column("fecha_inicio")]
 
     public DateTime FechaInicio { get; set; }
-
     [Required]
     [Column("fecha_fin")]
 

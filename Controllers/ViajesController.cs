@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using TravelPlannerAPI.Models;
+using Newtonsoft.Json;
 
 public class ViajesController : ControllerBase
 {
@@ -20,7 +21,6 @@ public class ViajesController : ControllerBase
 
     // Crear un nuevo viaje
     [HttpPost]
-    [Authorize]
     [Route("api/viajes")]
     public async Task<IActionResult> CrearViaje([FromBody] Viaje viaje)
     {
@@ -50,19 +50,32 @@ public class ViajesController : ControllerBase
             .Where(v => v.IdUsuario == userId)
             .ToListAsync();
 
-        return Ok(viajes);
+        return Ok(viajes.Select(v => new
+        {
+            v.IdViaje,
+            v.IdUsuario,
+            v.Nombre,
+            v.Descripcion,
+            FechaInicio = v.FechaInicio.ToString("yyyy-MM-ddTHH:mm:ssZ"),
+            FechaFin = v.FechaFin.ToString("yyyy-MM-ddTHH:mm:ssZ")
+        }));
     }
 
     // Obtener un viaje por su id
     [HttpGet]
-    [Authorize]
     [Route("api/viajes/{id}")]
     public async Task<IActionResult> ObtenerViaje(int id)
     {
-        var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
-
         var viaje = await _context.Viajes
-            .Where(v => v.IdViaje == id && v.IdUsuario == userId)
+            .Where(v => v.IdViaje == id)
+            .Select(v => new
+            {
+                IdViaje = v.IdViaje,
+                Nombre = v.Nombre,
+                FechaInicio = v.FechaInicio.ToString("yyyy-MM-dd'T'HH:mm:ss"), // Formato ISO 8601
+                Descripcion = v.Descripcion,
+                FechaFin = v.FechaFin.ToString("yyyy-MM-dd'T'HH:mm:ss"), // Formato ISO 8601
+            })
             .FirstOrDefaultAsync();
 
         if (viaje == null)
@@ -75,19 +88,20 @@ public class ViajesController : ControllerBase
 
     // Actualizar un viaje
     [HttpPut]
-    [Authorize]
     [Route("api/viajes/{id}")]
     public async Task<IActionResult> ActualizarViaje(int id, [FromBody] Viaje viaje)
     {
+            Console.WriteLine("Datos recibidos: " + JsonConvert.SerializeObject(viaje));  // Verifica los datos recibidos
+
         if (viaje == null || viaje.IdViaje != id)
         {
+            Console.WriteLine("Datos inválidos para el viaje" + viaje);
             return BadRequest("Datos del viaje inválidos.");
         }
 
-        var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
 
         var viajeExistente = await _context.Viajes
-            .Where(v => v.IdViaje == id && v.IdUsuario == userId)
+            .Where(v => v.IdViaje == id)
             .FirstOrDefaultAsync();
 
         if (viajeExistente == null)
