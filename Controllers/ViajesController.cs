@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using System.Linq;
 using System.Threading.Tasks;
+
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using TravelPlannerAPI.Models;
@@ -22,6 +23,8 @@ public class ViajesController : ControllerBase
     // Crear un nuevo viaje
     [HttpPost]
     [Route("api/viajes")]
+    [Authorize]
+
     public async Task<IActionResult> CrearViaje([FromBody] Viaje viaje)
     {
         if (viaje == null)
@@ -41,7 +44,7 @@ public class ViajesController : ControllerBase
     // Obtener todos los viajes de un usuario
     [HttpGet]
     [Authorize]
-    [Route("api/viajes")]
+    [Route("api/viajes/viajesuser")]
     public async Task<IActionResult> ObtenerViajes()
     {
         var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
@@ -63,6 +66,8 @@ public class ViajesController : ControllerBase
 
     // Obtener un viaje por su id
     [HttpGet]
+    [Authorize]
+
     [Route("api/viajes/{id}")]
     public async Task<IActionResult> ObtenerViaje(int id)
     {
@@ -88,10 +93,13 @@ public class ViajesController : ControllerBase
 
     // Actualizar un viaje
     [HttpPut]
+    [Authorize]
+
     [Route("api/viajes/{id}")]
     public async Task<IActionResult> ActualizarViaje(int id, [FromBody] Viaje viaje)
     {
-            Console.WriteLine("Datos recibidos: " + JsonConvert.SerializeObject(viaje));  // Verifica los datos recibidos
+
+        Console.WriteLine("este es el viaje" + viaje);  // Verifica los datos recibidos
 
         if (viaje == null || viaje.IdViaje != id)
         {

@@ -3,8 +3,20 @@ using TravelPlannerAPI.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.Extensions.FileProviders;
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: MyAllowSpecificOrigins,
+        policy =>
+        {
+            policy.WithOrigins("http://10.0.2.2:5173") // Permite el acceso desde el emulador
+                  .AllowAnyMethod()
+                  .AllowAnyHeader();
+        });
+});
 builder.WebHost.ConfigureKestrel(options =>
 {
     options.ListenAnyIP(5173); // Escuchar en todas las IPs
@@ -68,6 +80,12 @@ using (var scope = app.Services.CreateScope())
 Console.WriteLine($"Aplicación levantada en el puerto: {builder.Configuration["ASPNETCORE_URLS"]}");
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseCors(MyAllowSpecificOrigins);
 app.MapControllers();
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "uploads")),
+    RequestPath = "/uploads"
+});
 app.Run();
 

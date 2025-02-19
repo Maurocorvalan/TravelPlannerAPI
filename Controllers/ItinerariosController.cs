@@ -17,6 +17,7 @@ public class ItinerariosController : ControllerBase
     // Crear un nuevo itinerario
     [HttpPost]
     [Authorize]
+
     [Route("api/viajes/{idViaje}/itinerarios")]
     public async Task<IActionResult> CrearItinerario(int idViaje, [FromBody] Itinerario itinerario)
     {
@@ -40,6 +41,7 @@ public class ItinerariosController : ControllerBase
     // Obtener todos los itinerarios de un viaje
     [HttpGet]
     [Authorize]
+
     [Route("api/viajes/{idViaje}/itinerarios")]
     public async Task<IActionResult> ObtenerItinerarios(int idViaje)
     {
@@ -62,6 +64,7 @@ public class ItinerariosController : ControllerBase
     // Obtener un itinerario por su id
     [HttpGet]
     [Authorize]
+
     [Route("api/viajes/{idViaje}/itinerarios/{id}")]
     public async Task<IActionResult> ObtenerItinerario(int idViaje, int id)
     {
@@ -89,6 +92,7 @@ public class ItinerariosController : ControllerBase
     // Actualizar un itinerario
     [HttpPut]
     [Authorize]
+
     [Route("api/viajes/{idViaje}/itinerarios/{id}")]
     public async Task<IActionResult> ActualizarItinerario(int idViaje, int id, [FromBody] Itinerario itinerario)
     {
@@ -110,7 +114,6 @@ public class ItinerariosController : ControllerBase
             return NotFound("El itinerario no existe o no pertenece a este viaje.");
         }
 
-        itinerarioExistente.Fecha = itinerario.Fecha;
         itinerarioExistente.Actividad = itinerario.Actividad;
         itinerarioExistente.Ubicacion = itinerario.Ubicacion;
 
@@ -123,6 +126,7 @@ public class ItinerariosController : ControllerBase
     // Eliminar un itinerario
     [HttpDelete]
     [Authorize]
+
     [Route("api/viajes/{idViaje}/itinerarios/{id}")]
     public async Task<IActionResult> EliminarItinerario(int idViaje, int id)
     {

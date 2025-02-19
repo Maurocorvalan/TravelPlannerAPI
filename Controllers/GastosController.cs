@@ -19,6 +19,7 @@ public class GastosController : ControllerBase
     // Crear un nuevo gasto
     [HttpPost]
     [Authorize]
+
     public async Task<IActionResult> CrearGasto([FromBody] Gasto gasto)
     {
         if (gasto == null)
@@ -43,6 +44,7 @@ public class GastosController : ControllerBase
     // Obtener todos los gastos de un viaje
     [HttpGet("{idViaje}")]
     [Authorize]
+
     public async Task<IActionResult> ObtenerGastos(int idViaje)
     {
         var gastos = await _context.Gastos
@@ -60,6 +62,7 @@ public class GastosController : ControllerBase
     // Obtener un gasto por su id
     [HttpGet("gasto/{id}")]
     [Authorize]
+
     public async Task<IActionResult> ObtenerGasto(int id)
     {
         var gasto = await _context.Gastos
@@ -76,6 +79,7 @@ public class GastosController : ControllerBase
     // Actualizar un gasto
     [HttpPut("{id}")]
     [Authorize]
+
     public async Task<IActionResult> ActualizarGasto(int id, [FromBody] Gasto gasto)
     {
 
@@ -90,7 +94,6 @@ public class GastosController : ControllerBase
         gastoExistente.Categoria = gasto.Categoria;
         gastoExistente.Monto = gasto.Monto;
         gastoExistente.Descripcion = gasto.Descripcion;
-        gastoExistente.FechaGasto = gasto.FechaGasto;
 
         _context.Entry(gastoExistente).State = EntityState.Modified;
         await _context.SaveChangesAsync();
@@ -101,6 +104,7 @@ public class GastosController : ControllerBase
     // Eliminar un gasto
     [HttpDelete("{id}")]
     [Authorize]
+
     public async Task<IActionResult> EliminarGasto(int id)
     {
         var gasto = await _context.Gastos

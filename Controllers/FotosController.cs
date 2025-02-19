@@ -24,6 +24,8 @@ public class FotosController : ControllerBase
 
     //  Subir una foto
     [HttpPost("{idViaje}")]
+    [Authorize]
+
     public async Task<IActionResult> SubirFoto(int idViaje, [FromForm] IFormFile archivo, [FromForm] string descripcion)
     {
         if (archivo == null || archivo.Length == 0)
@@ -31,7 +33,7 @@ public class FotosController : ControllerBase
 
         string fileName = $"{Guid.NewGuid()}_{archivo.FileName}";
         string filePath = Path.Combine(_uploadPath, fileName);
-        string relativePath = Path.Combine("uploads", fileName);
+        string relativePath = Path.Combine("uploads", fileName).Replace("\\", "/");
 
         using (var stream = new FileStream(filePath, FileMode.Create))
         {
@@ -43,7 +45,6 @@ public class FotosController : ControllerBase
             IdViaje = idViaje,
             Url = relativePath,
             Descripcion = descripcion,
-            FechaSubida = DateTime.UtcNow
         };
 
         _context.Fotos.Add(foto);
@@ -54,6 +55,8 @@ public class FotosController : ControllerBase
 
     // Obtener todas las fotos de un viaje
     [HttpGet("{idViaje}")]
+    [Authorize]
+
     public async Task<IActionResult> ObtenerFotos(int idViaje)
     {
         var fotos = await _context.Fotos.Where(f => f.IdViaje == idViaje).ToListAsync();
@@ -62,6 +65,8 @@ public class FotosController : ControllerBase
 
     // Eliminar una foto
     [HttpDelete("{idFoto}")]
+    [Authorize]
+
     public async Task<IActionResult> EliminarFoto(int idFoto)
     {
         var foto = await _context.Fotos.FindAsync(idFoto);
@@ -81,6 +86,8 @@ public class FotosController : ControllerBase
     }
     //Obtener foto por ID
     [HttpGet("foto/{idFoto}")]
+    [Authorize]
+
     public async Task<IActionResult> ObtenerFoto(int idFoto)
     {
         var foto = await _context.Fotos.FindAsync(idFoto);
@@ -123,7 +130,6 @@ public class FotosController : ControllerBase
             fotoExistente.Descripcion = descripcion;
         }
 
-        fotoExistente.FechaSubida = DateTime.Now;
 
         _context.Entry(fotoExistente).State = EntityState.Modified;
 

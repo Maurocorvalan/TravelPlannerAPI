@@ -20,6 +20,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("login")]
+    
     public IActionResult Login([FromBody] UsuarioLoginDTO usuarioDto)
     {
         if (!ModelState.IsValid)

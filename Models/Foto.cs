@@ -19,8 +19,7 @@ public class Foto
     public string Url { get; set; }
 
     public string Descripcion { get; set; }
-    [Column("fecha_subida")]
-    public DateTime FechaSubida { get; set; } = DateTime.Now;
+
 
     // Relaciones
     [ForeignKey("IdViaje")]

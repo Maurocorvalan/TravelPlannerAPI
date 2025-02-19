@@ -23,9 +23,7 @@ public class Gasto
     [Column("descripcion")]
     public string Descripcion { get; set; }
 
-    [Required]
-    [Column("fecha_gasto", TypeName  ="DateTime")]
-    public DateTime FechaGasto { get; set; }
+
 
 
 }

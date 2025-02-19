@@ -11,8 +11,6 @@ public class Itinerario
     [Column("id_viaje")]
     public int IdViaje { get; set; }
 
-    [Required]
-    public DateTime Fecha { get; set; }
 
     [Required]
     [StringLength(500)]

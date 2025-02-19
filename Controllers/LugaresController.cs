@@ -32,6 +32,8 @@ public class LugaresController : ControllerBase
 
     // Obtener todos los lugares
     [HttpGet]
+    [Authorize]
+
     public async Task<IActionResult> ObtenerLugares()
     {
         var lugares = await _context.Lugares.ToListAsync();
@@ -40,6 +42,8 @@ public class LugaresController : ControllerBase
 
     // Obtener un lugar por ID
     [HttpGet("{id}")]
+    [Authorize]
+
     public async Task<IActionResult> ObtenerLugar(int id)
     {
         var lugar = await _context.Lugares.FindAsync(id);
@@ -51,6 +55,7 @@ public class LugaresController : ControllerBase
 
     // Actualizar un lugar
     [HttpPut("{id}")]
+    
     [Authorize]
     public async Task<IActionResult> ActualizarLugar(int id, [FromBody] Lugar lugar)
     {
