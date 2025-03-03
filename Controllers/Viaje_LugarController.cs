@@ -89,8 +89,6 @@ public class ViajeLugarController : ControllerBase
     // Eliminar un lugar de un viaje
 
     [HttpDelete("viaje/{idViaje}/lugar/{idLugar}")]
-    [Authorize]
-
     public async Task<IActionResult> EliminarLugarDeViaje(int idViaje, int idLugar)
     {
         var viajeLugar = await _context.Viaje_Lugar

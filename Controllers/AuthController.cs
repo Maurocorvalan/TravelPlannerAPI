@@ -20,17 +20,16 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("login")]
-    
-    public IActionResult Login([FromBody] UsuarioLoginDTO usuarioDto)
+    public IActionResult Login([FromForm] string Correo, [FromForm] string Contrasena)
     {
-        if (!ModelState.IsValid)
+        if (string.IsNullOrEmpty(Correo) || string.IsNullOrEmpty(Contrasena))
         {
             return BadRequest(new { mensaje = "Datos inválidos" });
         }
 
-        var usuario = _context.Usuarios.SingleOrDefault(u => u.Correo == usuarioDto.Correo);
+        var usuario = _context.Usuarios.SingleOrDefault(u => u.Correo == Correo);
 
-        if (usuario == null || !BCrypt.Net.BCrypt.Verify(usuarioDto.Contrasena, usuario.Contrasena)) 
+        if (usuario == null || !BCrypt.Net.BCrypt.Verify(Contrasena, usuario.Contrasena))
         {
             return Unauthorized(new { mensaje = "Credenciales incorrectas" });
         }
@@ -40,11 +39,10 @@ public class AuthController : ControllerBase
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {
-            Subject = new ClaimsIdentity(new[]
-            {
-                new Claim(ClaimTypes.NameIdentifier, usuario.IdUsuario.ToString()),
-                new Claim(ClaimTypes.Email, usuario.Correo)
-            }),
+            Subject = new ClaimsIdentity(new[] {
+            new Claim(ClaimTypes.NameIdentifier, usuario.IdUsuario.ToString()),
+            new Claim(ClaimTypes.Email, usuario.Correo)
+        }),
             Expires = DateTime.UtcNow.AddHours(2),
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
             Issuer = _config["JwtSettings:Issuer"],
@@ -52,8 +50,12 @@ public class AuthController : ControllerBase
         };
 
         var token = tokenHandler.CreateToken(tokenDescriptor);
-        return Ok(new { token = tokenHandler.WriteToken(token) });
+        string tokenString = tokenHandler.WriteToken(token);
+
+        // Cambia la respuesta para retornar solo el token
+        return Ok(tokenString);
     }
+
 
     [HttpPost("register")]
     public IActionResult Register([FromBody] Usuario usuario)

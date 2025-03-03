@@ -9,6 +9,7 @@ public class ItinerariosController : ControllerBase
 {
     private readonly TravelPlannerDbContext _context;
 
+
     public ItinerariosController(TravelPlannerDbContext context)
     {
         _context = context;
@@ -41,7 +42,6 @@ public class ItinerariosController : ControllerBase
     // Obtener todos los itinerarios de un viaje
     [HttpGet]
     [Authorize]
-
     [Route("api/viajes/{idViaje}/itinerarios")]
     public async Task<IActionResult> ObtenerItinerarios(int idViaje)
     {
@@ -56,6 +56,13 @@ public class ItinerariosController : ControllerBase
 
         var itinerarios = await _context.Itinerarios
             .Where(i => i.IdViaje == idViaje)
+            .Select(i => new
+            {
+                i.IdItinerario,
+                i.IdViaje,
+                i.Actividad,
+                i.Ubicacion
+            })
             .ToListAsync();
 
         return Ok(itinerarios);
@@ -151,6 +158,6 @@ public class ItinerariosController : ControllerBase
         _context.Itinerarios.Remove(itinerario);
         await _context.SaveChangesAsync();
 
-        return NoContent();
+        return Ok();
     }
 }

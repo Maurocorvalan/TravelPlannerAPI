@@ -19,7 +19,6 @@ public class GastosController : ControllerBase
     // Crear un nuevo gasto
     [HttpPost]
     [Authorize]
-
     public async Task<IActionResult> CrearGasto([FromBody] Gasto gasto)
     {
         if (gasto == null)
@@ -38,8 +37,10 @@ public class GastosController : ControllerBase
         _context.Gastos.Add(gasto);
         await _context.SaveChangesAsync();
 
-        return CreatedAtAction("ObtenerGasto", new { id = gasto.IdGasto }, gasto);
+        // Devolver el objeto Gasto o un mensaje de confirmación
+        return Ok(new { mensaje = "Gasto creado exitosamente", gasto = gasto });
     }
+
 
     // Obtener todos los gastos de un viaje
     [HttpGet("{idViaje}")]
@@ -82,7 +83,7 @@ public class GastosController : ControllerBase
 
     public async Task<IActionResult> ActualizarGasto(int id, [FromBody] Gasto gasto)
     {
-
+        Console.WriteLine("GASTO QUE LLEGO= " + gasto.Categoria);
         var gastoExistente = await _context.Gastos
             .FirstOrDefaultAsync(g => g.IdGasto == id);
 
@@ -120,4 +121,19 @@ public class GastosController : ControllerBase
 
         return NoContent();
     }
+
+    // Obtener el total gastado en un viaje
+
+    [HttpGet("total/{idViaje}")]
+    [Authorize]
+
+    public async Task<IActionResult> ObtenerTotalGastado(int idViaje)
+    {
+        var totalGastado = await _context.Gastos
+            .Where(g => g.IdViaje == idViaje)
+            .SumAsync(g => g.Monto);
+
+        return Ok(new { IdViaje = idViaje, TotalGastado = totalGastado });
+    }
+
 }

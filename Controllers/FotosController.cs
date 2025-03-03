@@ -139,5 +139,24 @@ public class FotosController : ControllerBase
     }
 
 
+
+    [HttpGet("{idViaje}/foto")]
+    [Authorize]
+    public async Task<IActionResult> ObtenerFotoRepresentativa(int idViaje)
+    {
+        var foto = await _context.Fotos
+            .Where(f => f.IdViaje == idViaje)
+            .OrderBy(f => f.IdFoto)
+            .FirstOrDefaultAsync();
+
+        if (foto == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(foto);
+    }
+
+
 }
 

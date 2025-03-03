@@ -18,8 +18,7 @@ public class UsuarioController : ControllerBase
     }
 
     [HttpGet("me")]
-    [Authorize]
-
+    
     public IActionResult GetUserProfile()
     {
         try
@@ -60,8 +59,6 @@ public class UsuarioController : ControllerBase
 
 
     [HttpPut("update")]
-    [Authorize]
-
     public async Task<IActionResult> UpdateUserProfile([FromBody] UsuarioUpdateDTO userUpdateDTO)
     {
         var usuarioId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
