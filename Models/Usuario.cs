@@ -17,7 +17,6 @@ public class Usuario
     [EmailAddress]
     public string Correo { get; set; }
 
-    [Required]
     public string Contrasena { get; set; }
 
     [Column("fecha_registro")]

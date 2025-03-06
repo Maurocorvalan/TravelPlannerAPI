@@ -5,6 +5,12 @@ using System.Security.Claims;
 using System.Text;
 using BCrypt.Net;
 using TravelPlannerAPI.Models;
+using Microsoft.EntityFrameworkCore;
+using MailKit.Net.Smtp;
+using MailKit.Security;
+using MimeKit;
+using Microsoft.AspNetCore.Authorization;
+using MimeKit.Text;
 
 [Route("api/auth")]
 [ApiController]
@@ -20,6 +26,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("login")]
+
     public IActionResult Login([FromForm] string Correo, [FromForm] string Contrasena)
     {
         if (string.IsNullOrEmpty(Correo) || string.IsNullOrEmpty(Contrasena))
@@ -78,4 +85,121 @@ public class AuthController : ControllerBase
 
         return Ok(new { mensaje = "Usuario registrado exitosamente" });
     }
+
+    // Método para cambiar la contraseña
+    [HttpPost("change-password")]
+    [AllowAnonymous]
+    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
+    {
+        if (string.IsNullOrEmpty(request.ContrasenaActual) || string.IsNullOrEmpty(request.NuevaContrasena) || string.IsNullOrEmpty(request.ConfirmarContrasena))
+        {
+            return BadRequest(new { mensaje = "Datos inválidos" });
+        }
+
+        var usuarioId = GetUserIdFromToken(); 
+        if (usuarioId == null)
+        {
+            return Unauthorized(new { mensaje = "Usuario no autorizado" });
+        }
+
+        var usuario = await _context.Usuarios.FindAsync(usuarioId.Value); // Se usa .Value para acceder al valor de int?
+        if (usuario == null)
+        {
+            return BadRequest(new { mensaje = "Usuario no encontrado" });
+        }
+
+        // Verificar si la contraseña actual es correcta
+        if (!BCrypt.Net.BCrypt.Verify(request.ContrasenaActual, usuario.Contrasena))
+        {
+            return BadRequest(new { mensaje = "La contraseña actual es incorrecta" });
+        }
+
+        // Verificar que las contraseñas nuevas coincidan
+        if (request.NuevaContrasena != request.ConfirmarContrasena)
+        {
+            return BadRequest(new { mensaje = "Las nuevas contraseñas no coinciden" });
+        }
+
+        // Hashear la nueva contraseña y actualizarla en la base de datos
+        usuario.Contrasena = BCrypt.Net.BCrypt.HashPassword(request.NuevaContrasena);
+        _context.Usuarios.Update(usuario);
+        await _context.SaveChangesAsync();
+
+        return Ok(new { mensaje = "Contraseña cambiada exitosamente." });
+    }
+
+    // Método para obtener el ID del usuario desde el token
+    private int? GetUserIdFromToken()
+    {
+        var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (int.TryParse(userIdString, out var userId))
+        {
+            return userId; 
+        }
+        return null; 
+    }
+
+
+
+
+    [HttpPost("reset-password")]
+    public async Task<IActionResult> ResetPassword([FromForm] string email)
+    {
+        try
+        {
+            // Buscar al usuario por email
+            var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.Correo == email);
+            if (usuario == null)
+            {
+                return BadRequest(new { mensaje = "El correo ingresado no existe." });
+            }
+
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            var result = new StringBuilder(6);
+            Random random = new Random();
+            for (int i = 0; i < 6; i++)
+            {
+                result.Append(chars[random.Next(chars.Length)]);
+            }
+
+            string enlace = result.ToString();
+
+            string token = BCrypt.Net.BCrypt.HashPassword(enlace);
+            usuario.Contrasena = token;
+
+            _context.Usuarios.Update(usuario);
+            await _context.SaveChangesAsync();
+
+            // Crear el mensaje de correo
+            var message = new MimeKit.MimeMessage();
+            message.To.Add(new MailboxAddress(usuario.Nombre, usuario.Correo));
+            message.From.Add(new MailboxAddress("Sistema", _config["Smtp:User"]));
+            message.Subject = "Restablecer contraseña";
+            message.Body = new TextPart("html")
+            {
+                Text = $@"<p>Hola {usuario.Nombre}:</p>
+            <p>Hemos recibido una solicitud para restablecer la contraseña de tu cuenta.</p>
+            <p>Tu nuevo código de restablecimiento es: <strong>{enlace}</strong></p>
+            <p>Por razones de seguridad, te recomendamos cambiar esta contraseña después de iniciar sesión.</p>"
+            };
+
+            using (var client = new MailKit.Net.Smtp.SmtpClient())
+            {
+                client.ServerCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true;
+                await client.ConnectAsync(_config["Smtp:Host"], int.Parse(_config["Smtp:Port"]), MailKit.Security.SecureSocketOptions.Auto);
+                await client.AuthenticateAsync(_config["Smtp:User"], _config["Smtp:Pass"]);
+                await client.SendAsync(message);
+                await client.DisconnectAsync(true);
+            }
+
+            return Ok(new { mensaje = "Correo enviado con éxito. Revisa tu bandeja de entrada para restablecer tu contraseña." });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { mensaje = $"Error: {ex.Message}" });
+        }
+    }
+
+
+
 }
